@@ -1,8 +1,13 @@
+import argparse
 import curses
+import os
+
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
 import html2text
+
+
 
 class EpubReader:
 	def __init__(self, stdscr, epub_path):
@@ -79,10 +84,27 @@ class EpubReader:
 			elif key == curses.KEY_HOME:
 				self.current_page = 0
 
-def main(stdscr):
+
+def read_epub(stdscr, epub_path):
 	curses.curs_set(0)
 	stdscr.keypad(True)
-	reader = EpubReader(stdscr, "book.epub")
+	reader = EpubReader(stdscr, epub_path)
+
+
+def main():
+	parser = argparse.ArgumentParser(description="epubread.py - Reading EPUB files in the terminal.")
+
+	# Positional argument: Path
+	parser.add_argument("path", type=str, help="Path to the EPUB file")
+	args = parser.parse_args()
+	if not args.path.endswith('.epub'):
+		print(f"Files format NOT supported: '{args.path}'"); return
+	elif not os.path.isfile(args.path):
+		print(f"File NOT found: '{args.path}'"); return
+
+	epub_path = args.path
+	curses.wrapper(read_epub, epub_path)
+
 
 if __name__ == "__main__":
-	curses.wrapper(main)
+	main()
